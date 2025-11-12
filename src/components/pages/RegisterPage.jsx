@@ -117,7 +117,7 @@ export default function RegisterPage() {
             <Image
               onClick={togglePassword}
               src="/btn_visibility_on.png"
-              alt="google"
+              alt="btn_visibility"
               width={20}
               height={20}
               className="absolute top-1/2 right-7 transform -translate-y-1/2 cursor-pointer"
@@ -126,7 +126,7 @@ export default function RegisterPage() {
             <Image
               onClick={togglePassword}
               src="/btn_visibility.png"
-              alt="google"
+              alt="btn_visibility"
               width={20}
               height={20}
               className="absolute top-1/2 right-7 transform -translate-y-1/2 cursor-pointer"
