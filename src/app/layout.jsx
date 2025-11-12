@@ -5,9 +5,9 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 
 const rokafSans = localFont({
-  src: "./fonts/ROKAF Sans Bold.otf",
+  src: "./fonts/ROKAFSans-Bold.ttf",
   variable: "--font-rokaf-sans",
-  weight: "100 700",
+  weight: "700",
 });
 
 const geistSans = Geist({
@@ -27,7 +27,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${rokafSans.variable} antialiased`}
       >
