@@ -78,7 +78,6 @@ export default function LoginPage() {
           value={values.email}
           className="bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4"
           placeholder="이메일을 입력해주세요"
-          value={values.email}
           onChange={handleChange}
         />
         <h3 className="font-bold text-lg">비밀번호</h3>
@@ -89,7 +88,6 @@ export default function LoginPage() {
             type={showPassword ? "text" : "password"}
             className="bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4 relative"
             placeholder="비밀번호를 입력해주세요"
-            value={values.password}
             onChange={handleChange}
           />
           {showPassword ? (
