@@ -1,16 +1,20 @@
-export async function addComment({ postId, content }) {
+"use server";
+
+export async function addComment({ articleId, content }) {
   try {
-    const response = await fetch("http://localhost:4000/comments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        postId,
-        content,
-        createdAt: new Date().toISOString(),
-      }),
-    });
+    const response = await fetch(
+      `http://panda-market-api.vercel.app/articles/${articleId}/comments`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content,
+          createdAt: new Date().toISOString(),
+        }),
+      }
+    );
     if (!response.ok) {
       throw new Error("댓글 작성 실패");
     }
@@ -20,18 +24,24 @@ export async function addComment({ postId, content }) {
   }
 }
 
-export async function getComments(postId) {
+export async function getComments(articleId) {
   const response = await fetch(
-    `http://localhost:4000/comments?postId=${postId}&_sort=createdAt&_order=desc`,
+    `http://panda-market-api.vercel.app/articles/${articleId}/comments?_sort=createdAt&order=desc`,
     { cache: "no-store" }
   );
+  if (!response.ok) {
+    throw new Error("댓글 불러오기 실패");
+  }
+
   const data = await response.json();
   return data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
-export async function deleteComment(commentId) {
+export async function deleteComment(articleId, commentId) {
   const response = await fetch(
-    `http://localhost:4000/comments/${String(commentId)}`,
+    `http://panda-market-api.vercel.app/articles/${articleId}/comments/${String(
+      commentId
+    )}`,
     {
       method: "DELETE",
     }

@@ -8,8 +8,8 @@ import { getArticleById } from "@/lib/services/ItemApi";
 export default async function ItemDetailPage(props) {
   const params = await props.params;
   const id = params.id;
-  const item = await getArticleById(id);
-  const comments = await getComments(id);
+  const item = getArticleById(id);
+  const comments = getComments(id);
 
   return (
     <PageContainer>

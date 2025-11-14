@@ -181,8 +181,11 @@ export default function LoginPage() {
           <p className="text-red-500 text-sm mb-5">{passwordError}</p>
         )}
       </div>
-      <button className="bg-gray-400 text-white rounded-3xl w-full max-w-[640px] py-4 mb-5 font-bold">
-        로그인
+      <button
+        disabled={loading}
+        className="bg-gray-400 text-white rounded-3xl w-full max-w-[640px] py-4 mb-5 font-bold"
+      >
+        {loading ? "로그인 중..." : "로그인"}
       </button>
       <div className="flex justify-between items-center bg-[#E6F2FF] rounded-lg p-2 px-5 py-5 w-full max-w-[640px]">
         <span>간편 로그인하기</span>

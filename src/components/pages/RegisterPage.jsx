@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/providers/AuthProvider";
 import { useRouter } from "next/navigation";
+import { authService } from "@/lib/services/authService";
+import { registerAction } from "@/lib/services/actions/auth";
 
 export default function RegisterPage() {
   const [emailError, setEmailError] = useState("");
@@ -16,7 +18,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordRepeat, setShowPasswordRepeat] = useState(false);
 
-  const { register } = useAuth();
   const router = useRouter();
 
   const [values, setValues] = useState({
@@ -134,7 +135,9 @@ export default function RegisterPage() {
 
     try {
       setLoading(true);
-      await register(values.name, values.email, values.password);
+      console.log("회원가입 제출");
+      // await authService.register(values.name, values.email, values.password);
+      await registerAction(values.name, values.email, values.password);
 
       alert("회원가입 성공");
       router.push("/login");
@@ -268,8 +271,11 @@ export default function RegisterPage() {
           <p className="text-red-500 text-sm mb-5">{passwordRepeatError}</p>
         )}
       </div>
-      <button className="bg-gray-400 text-white rounded-3xl w-full max-w-[640px] py-4 mb-5 font-bold">
-        회원가입
+      <button
+        disabled={loading}
+        className="bg-gray-400 text-white rounded-3xl w-full max-w-[640px] py-4 mb-5 font-bold"
+      >
+        {loading ? "가입 중..." : "회원가입"}
       </button>
       {error && <p className="text-red-500 font-semibold mt-3 mb-5">{error}</p>}
       <div className="flex justify-between items-center bg-[#E6F2FF] rounded-lg p-2 px-5 py-5 w-full max-w-[640px]">

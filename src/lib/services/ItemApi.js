@@ -41,6 +41,7 @@ export async function addArticle({ title, content }) {
         body: JSON.stringify({
           title,
           content,
+          image: "https://example.com/image.jpg",
         }),
       }
     );
