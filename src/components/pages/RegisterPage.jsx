@@ -6,18 +6,25 @@ import { useAuth } from "@/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const [emailError, setEmailError] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordRepeatError, setPasswordRepeatError] = useState();
+  const [error, setError] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordRepeat, setShowPasswordRepeat] = useState(false);
+
+  const { register } = useAuth();
+  const router = useRouter();
+
   const [values, setValues] = useState({
     name: "",
     email: "",
     password: "",
     passwordRepeat: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordRepeat, setShowPasswordRepeat] = useState(false);
-  const { register } = useAuth();
-  const router = useRouter();
 
   const togglePassword = () => {
     setShowPassword((prev) => !prev);
@@ -27,35 +34,106 @@ export default function RegisterPage() {
     setShowPasswordRepeat((prev) => !prev);
   };
 
+  const validateEmail = (email) => {
+    return email.includes("@") && email.includes(".");
+  };
+
+  const validateForm = () => {
+    let valid = true;
+
+    if (values.email.trim() === "") {
+      setEmailError("이메일을 입력해주세요.");
+      valid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (values.name.trim() === "") {
+      setNameError("닉네임을 입력해주세요.");
+      valid = false;
+    } else {
+      setNameError("");
+    }
+
+    if (values.password.trim() === "") {
+      setPasswordError("비밀번호를 입력해주세요.");
+      valid = false;
+    } else {
+      setPasswordError("");
+    }
+
+    if (values.passwordRepeat.trim() === "") {
+      setPasswordRepeatError("비밀번호를 다시 한 번 입력해주세요.");
+      valid = false;
+    } else {
+      setPasswordRepeatError("");
+    }
+
+    return valid;
+  };
+
+  const handleEmailBlur = () => {
+    if (values.email.trim() === "") {
+      setEmailError("이메일을 입력해주세요.");
+    } else if (!validateEmail(values.email)) {
+      setEmailError("올바른 이메일 주소를 입력해주세요.");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const handleNameBlur = () => {
+    if (values.name.trim() === "") {
+      setNameError("닉네임을 입력해주세요.");
+    } else {
+      setNameError("");
+    }
+  };
+
+  const handlePasswordBlur = () => {
+    if (values.password.trim() === "") {
+      setPasswordError("비밀번호를 입력해주세요.");
+    } else {
+      setPasswordError("");
+    }
+  };
+
+  const handlePasswordRepeatBlur = () => {
+    if (values.passwordRepeat.trim() === "") {
+      setPasswordRepeatError("비밀번호를 다시 한 번 입력해주세요.");
+    } else {
+      setPasswordRepeatError("");
+    }
+  };
+
   function handleChange(e) {
     const { name, value } = e.target;
-    setValues((prevValues) => ({
-      ...prevValues,
+    setValues((prev) => ({
+      ...prev,
       [name]: value,
     }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (
-      !values.name ||
-      !values.email ||
-      !values.password ||
-      !values.passwordRepeat
-    ) {
-      setError("모든 필드를 입력해주세요.");
+
+    setEmailError("");
+    setNameError("");
+    setPasswordError("");
+    setPasswordRepeatError("");
+    setError("");
+
+    if (!validateForm()) {
       return;
     }
 
     if (values.password !== values.passwordRepeat) {
-      setError("비밀번호가 일치하지 않습니다.");
+      setPasswordRepeatError("비밀번호가 일치하지 않습니다.");
       return;
     }
 
     try {
       setLoading(true);
-      setError(null);
-
       await register(values.name, values.email, values.password);
 
       alert("회원가입 성공");
@@ -92,17 +170,27 @@ export default function RegisterPage() {
           name="email"
           value={values.email}
           onChange={handleChange}
-          className="bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4"
+          onBlur={handleEmailBlur}
           placeholder="이메일을 입력해주세요"
+          className={`bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4 ${
+            emailError ? " border border-red-500" : " border border-gray-300"
+          }`}
         />
+        {emailError && (
+          <p className="text-red-500 text-sm mb-5">{emailError}</p>
+        )}
         <label className="font-bold text-lg">닉네임</label>
         <input
           value={values.name}
           name="name"
           onChange={handleChange}
-          className="bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4"
+          onBlur={handleNameBlur}
           placeholder="닉네임을 입력해주세요"
+          className={`bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4 ${
+            nameError ? " border border-red-500" : " border border-gray-300"
+          }`}
         />
+        {nameError && <p className="text-red-500 text-sm mb-5">{nameError}</p>}
         <label className="font-bold text-lg">비밀번호</label>
         <div className="relative w-full max-w-[640px]">
           <input
@@ -110,8 +198,13 @@ export default function RegisterPage() {
             name="password"
             type={showPassword ? "text" : "password"}
             onChange={handleChange}
-            className="bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4 relative"
+            onBlur={handlePasswordBlur}
             placeholder="비밀번호를 입력해주세요"
+            className={`bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4 relative ${
+              passwordError
+                ? " border border-red-500"
+                : " border border-gray-300"
+            }`}
           />
           {showPassword ? (
             <Image
@@ -133,6 +226,9 @@ export default function RegisterPage() {
             />
           )}
         </div>
+        {passwordError && (
+          <p className="text-red-500 text-sm mb-5">{passwordError}</p>
+        )}
         <label className="font-bold text-lg">비밀번호 확인</label>
         <div className="relative w-full max-w-[640px]">
           <input
@@ -140,8 +236,13 @@ export default function RegisterPage() {
             name="passwordRepeat"
             type={showPasswordRepeat ? "text" : "password"}
             onChange={handleChange}
-            className="bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4 relative"
+            onBlur={handlePasswordRepeatBlur}
             placeholder="비밀번호를 다시 한 번 입력해주세요"
+            className={`bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4 relative ${
+              passwordRepeatError
+                ? " border border-red-500"
+                : " border border-gray-300"
+            }`}
           />
           {showPasswordRepeat ? (
             <Image
@@ -163,6 +264,9 @@ export default function RegisterPage() {
             />
           )}
         </div>
+        {passwordRepeatError && (
+          <p className="text-red-500 text-sm mb-5">{passwordRepeatError}</p>
+        )}
       </div>
       <button className="bg-gray-400 text-white rounded-3xl w-full max-w-[640px] py-4 mb-5 font-bold">
         회원가입

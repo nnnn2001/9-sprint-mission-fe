@@ -6,12 +6,16 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 
 export default function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const { login } = useAuth();
   const router = useRouter();
+
   const [values, setValues] = useState({
     email: "",
     password: "",
@@ -21,32 +25,81 @@ export default function LoginPage() {
     setShowPassword((prev) => !prev);
   };
 
+  const validateEmail = (email) => {
+    return email.includes("@") && email.includes(".");
+  };
+
+  const validateForm = () => {
+    let valid = true;
+
+    if (values.email.trim() === "") {
+      setEmailError("이메일을 입력해주세요.");
+      valid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (values.password.trim() === "") {
+      setPasswordError("비밀번호를 입력해주세요.");
+      valid = false;
+    } else {
+      setPasswordError("");
+    }
+
+    return valid;
+  };
+
+  const handleEmailBlur = () => {
+    if (values.email.trim() === "") {
+      setEmailError("이메일을 입력해주세요.");
+    } else if (!validateEmail(values.email)) {
+      setEmailError("올바른 이메일 주소를 입력해주세요.");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const handlePasswordBlur = () => {
+    if (values.password.trim() === "") {
+      setPasswordError("비밀번호를 입력해주세요.");
+    } else {
+      setPasswordError("");
+    }
+  };
+
   function handleChange(e) {
     const { name, value } = e.target;
 
-    setValues((prevValues) => ({
-      ...prevValues,
+    setValues((prev) => ({
+      ...prev,
       [name]: value,
     }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!values.email || !values.password) {
-      setError("모든 필드를 입력해주세요.");
+
+    setPasswordError("");
+    setEmailError("");
+    setError("");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    if (!validateEmail(values.email)) {
+      setEmailError("올바른 이메일 주소를 입력해주세요.");
       return;
     }
 
     try {
       setLoading(true);
-      setError(null);
-
-      await login(values.name, values.password);
+      await login(values.email, values.password);
 
       alert("로그인 성공");
       router.push("/");
     } catch (error) {
-      setError(error.message || "회원가입 실패");
+      setError(error.message || "로그인 실패");
     } finally {
       setLoading(false);
     }
@@ -71,24 +124,38 @@ export default function LoginPage() {
         </div>
       </Link>
       <div className="flex flex-col w-full max-w-[640px]">
+        {/* 이메일 */}
         <h3 className="font-bold mt-10 text-lg">이메일</h3>
         <input
           name="email"
-          type="email"
+          type="text"
           value={values.email}
-          className="bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4"
-          placeholder="이메일을 입력해주세요"
           onChange={handleChange}
+          onBlur={handleEmailBlur}
+          placeholder="이메일을 입력해주세요"
+          className={`bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4 ${
+            emailError ? " border border-red-500" : " border border-gray-300"
+          }`}
         />
+        {emailError && (
+          <p className="text-red-500 text-sm mb-5">{emailError}</p>
+        )}
+
+        {/* 비밀번호 */}
         <h3 className="font-bold text-lg">비밀번호</h3>
         <div className="relative w-full max-w-[640px]">
           <input
             name="password"
-            value={values.password}
             type={showPassword ? "text" : "password"}
-            className="bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4 relative"
-            placeholder="비밀번호를 입력해주세요"
+            value={values.password}
             onChange={handleChange}
+            onBlur={handlePasswordBlur}
+            className={`bg-gray-100 rounded-lg w-full max-w-[640px] mt-5 mb-5 px-5 py-4 relative ${
+              passwordError
+                ? " border border-red-500"
+                : " border border-gray-300"
+            }`}
+            placeholder="비밀번호를 입력해주세요"
           />
           {showPassword ? (
             <Image
@@ -110,16 +177,18 @@ export default function LoginPage() {
             />
           )}
         </div>
+        {passwordError && (
+          <p className="text-red-500 text-sm mb-5">{passwordError}</p>
+        )}
       </div>
       <button className="bg-gray-400 text-white rounded-3xl w-full max-w-[640px] py-4 mb-5 font-bold">
         로그인
       </button>
-      {error && <p className="text-red-500 font-semibold mt-3 mb-5">{error}</p>}
       <div className="flex justify-between items-center bg-[#E6F2FF] rounded-lg p-2 px-5 py-5 w-full max-w-[640px]">
         <span>간편 로그인하기</span>
         <div className="flex gap-2">
           <Link href="https://www.google.com">
-            <Image src="/ic_google.png" alt="google" width={40} height={40} />{" "}
+            <Image src="/ic_google.png" alt="google" width={40} height={40} />
           </Link>
           <Link href="https://www.kakaocorp.com/page">
             <Image src="/ic_kakao.png" alt="kakao" width={40} height={40} />
