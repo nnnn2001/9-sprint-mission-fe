@@ -1,6 +1,6 @@
 /** 게시글 전체 가져오기 */
 export async function getArticles() {
-  const res = await fetch(`https://sprint-7-server.onrender.com/articles`, {
+  const res = await fetch(`https://panda-market-api.vercel.app/articles`, {
     cache: "no-store",
   });
   if (!res.ok) {
@@ -8,16 +8,16 @@ export async function getArticles() {
   }
   const json = await res.json();
 
-  const sorted = (json.data || []).sort(
+  const sorted = (json.list || []).sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
-  return { ...json, data: sorted };
+  return { ...json, list: sorted };
 }
 
 /** 특정 게시글 가져오기 */
 export async function getArticleById(id) {
   const res = await fetch(
-    `https://sprint-7-server.onrender.com/articles/${id}`,
+    `https://panda-market-api.vercel.app/articles/${id}`,
     { cache: "no-store" }
   );
 
@@ -32,7 +32,7 @@ export async function getArticleById(id) {
 export async function addArticle({ title, content }) {
   try {
     const response = await fetch(
-      "https://sprint-7-server.onrender.com/articles",
+      "https://panda-market-api.vercel.app/articles",
       {
         method: "POST",
         headers: {
@@ -56,7 +56,7 @@ export async function addArticle({ title, content }) {
 
 export async function deleteArticle(articleId) {
   const response = await fetch(
-    `https://sprint-7-server.onrender.com/articles/${articleId}`,
+    `https://panda-market-api.vercel.app/articles/${articleId}`,
     {
       method: "DELETE",
     }

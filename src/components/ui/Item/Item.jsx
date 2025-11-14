@@ -8,7 +8,7 @@ import Link from "next/link";
 export default function Item({ items }) {
   const [keyword, setKeyword] = useState("");
   const [open, setOpen] = useState(false);
-  const filterPosts = (items?.data ?? []).filter(
+  const filterPosts = (items?.list ?? []).filter(
     (it) =>
       it.title.toLowerCase().includes(keyword.toLowerCase()) ||
       it.content.toLowerCase().includes(keyword.toLowerCase())
